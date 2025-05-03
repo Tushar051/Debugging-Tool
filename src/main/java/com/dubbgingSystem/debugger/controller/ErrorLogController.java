@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -86,4 +87,29 @@ public class ErrorLogController {
     public ResponseEntity<ErrorLog> resolveErrorLog(@PathVariable String id) {
         return ResponseEntity.ok(errorLogService.resolveErrorLog(id));
     }
+
+
+    @GetMapping("/trigger-test-error") // Full path will be /api/trigger-test-error
+    public ResponseEntity<String> triggerTestError() {
+        try {
+            // Force an NPE
+            String nullString = null;
+            nullString.length();
+            return ResponseEntity.ok("Success");
+        } catch (Exception ex) {
+            ErrorLog error = new ErrorLog();
+            error.setErrorMessage("Test NPE");
+            error.setExceptionType("NullPointerException");
+            error.setStackTrace(ex.getStackTrace().toString());
+            error.setHttpMethod("GET");
+            error.setEndPoint("/api/trigger-test-error");
+            error.setSeverity(ErrorSeverity.HIGH);
+
+            ErrorLog savedError = errorLogService.logError(error);
+
+            return ResponseEntity.status(500)
+                    .body("Test error logged. ID: " + savedError.getId());
+        }
+    }
+
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -54,6 +55,27 @@ public class ErrorLogService {
         ErrorLog errorLog = getErrorLogById(id);
         errorLog.setStatus(ErrorStatus.RESOLVED);
         errorLog.setResolvedAt(LocalDateTime.now());
+        return errorLogRepository.save(errorLog);
+    }
+
+    public ErrorLog logError(String errorMessage, Exception ex, String httpMethod, String endpoint) {
+        ErrorLog errorLog = new ErrorLog();
+        errorLog.setErrorMessage(errorMessage);
+        errorLog.setExceptionType(ex.getClass().getSimpleName());
+        errorLog.setStackTrace(Arrays.toString(ex.getStackTrace()));
+        errorLog.setHttpMethod(httpMethod);
+        errorLog.setEndPoint(endpoint);
+        errorLog.setSeverity(ErrorSeverity.HIGH); // Default to HIGH
+        errorLog.setStatus(ErrorStatus.OPEN);
+        errorLog.setTimeStamp(LocalDateTime.now());
+
+        return errorLogRepository.save(errorLog);
+    }
+
+
+    public ErrorLog logError(ErrorLog errorLog) {
+        errorLog.setTimeStamp(LocalDateTime.now());
+        errorLog.setStatus(ErrorStatus.OPEN);
         return errorLogRepository.save(errorLog);
     }
 }
