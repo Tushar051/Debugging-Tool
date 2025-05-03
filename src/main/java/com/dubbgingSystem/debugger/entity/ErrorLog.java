@@ -3,11 +3,9 @@ package com.dubbgingSystem.debugger.entity;
 
 import com.dubbgingSystem.debugger.enums.ErrorSeverity;
 import com.dubbgingSystem.debugger.enums.ErrorStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,34 +17,58 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ErrorLog {
 
+
     @Id
     private String Id;
 
+
+    @NotBlank(message = "errorMessage is mandatory")
     private String errorMessage;
+
+
+    @NotBlank(message = "exceptionType is mandatory")
     private String exceptionType;
+
+
+    @NotBlank(message = "stackTrace is mandatory")
     private String stackTrace;
 
+
+    @NotBlank(message = "httpMethod is mandatory")
     private String httpMethod;
+
+
+    @NotBlank(message = "endPoint is mandatory")
     private String endPoint;
+
+    @NotNull(message = "severity is mandatory")
+    private ErrorSeverity severity = ErrorSeverity.MEDIUM; // Default value
+
+    @NotNull(message = "status is mandatory")
+    private ErrorStatus status = ErrorStatus.OPEN; // Default value
+
+    private String assignedTo;
+
+    private String environment = "DEV"; // Default value
+
+    private String serviceName;
+
+    private LocalDateTime timeStamp = LocalDateTime.now(); // Auto-set
+
+    private LocalDateTime resolvedAt;
+
+    private LocalDateTime lastUpdate;
+
+
+
     private String requestBody;
     private String requestParam;
 
-    private ErrorSeverity severity;
-    private ErrorStatus status;
-    private String assignedTo;
-    private String environment;
-    private String serviceName;
+    private String userId;
 
-    private LocalDateTime timeStamp = LocalDateTime.now();
-    private LocalDateTime resolvedAt;
-    private LocalDateTime lastUpdate;
+    private String clientIp;
 
-    private String userId;        // Affected user (if authenticated)
-    private String clientIp;      // Request origin IP
-    private String correlationId; // For tracing across microservices
-
-    // Repository Testing -->>
-    public void setEndpoint(String path) {}
+    private String correlationId;
 
 
     public String getId() {
@@ -95,22 +117,6 @@ public class ErrorLog {
 
     public void setEndPoint(String endPoint) {
         this.endPoint = endPoint;
-    }
-
-    public String getRequestBody() {
-        return requestBody;
-    }
-
-    public void setRequestBody(String requestBody) {
-        this.requestBody = requestBody;
-    }
-
-    public String getRequestParam() {
-        return requestParam;
-    }
-
-    public void setRequestParam(String requestParam) {
-        this.requestParam = requestParam;
     }
 
     public ErrorSeverity getSeverity() {
@@ -177,6 +183,22 @@ public class ErrorLog {
         this.lastUpdate = lastUpdate;
     }
 
+    public String getRequestBody() {
+        return requestBody;
+    }
+
+    public void setRequestBody(String requestBody) {
+        this.requestBody = requestBody;
+    }
+
+    public String getRequestParam() {
+        return requestParam;
+    }
+
+    public void setRequestParam(String requestParam) {
+        this.requestParam = requestParam;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -199,5 +221,9 @@ public class ErrorLog {
 
     public void setCorrelationId(String correlationId) {
         this.correlationId = correlationId;
+    }
+
+    public void setLastUpdated(LocalDateTime now) {
+
     }
 }
